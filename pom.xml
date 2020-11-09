@@ -25,6 +25,6 @@
     <modules>
         <module>Server</module>
         <module>Client</module>
-        <module>utils</module>
+        <module>Utils</module>
     </modules>
 </project>
