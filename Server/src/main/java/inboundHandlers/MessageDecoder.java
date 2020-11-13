@@ -3,20 +3,20 @@ package inboundHandlers;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ReplayingDecoder;
-import messages.Message;
+import messages.MessageUtils;
 
 import java.util.List;
 
-public class MessageDecoder extends ReplayingDecoder<Message> {
+public class MessageDecoder extends ReplayingDecoder<Void> {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
         in.markReaderIndex();
-        long len = in.readLong();
-        byte[] bytes = new byte[(int) (len)];
+        int len = in.readInt();
+        byte[] bytes = new byte[len];
         in.resetReaderIndex();
         in.readBytes(bytes);
-        out.add(Message.of(bytes));
+        out.add(MessageUtils.getMessageFromBytes(bytes));
     }
 
     @Override

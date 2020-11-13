@@ -1,5 +1,6 @@
 import inboundHandlers.MessageDecoder;
-import inboundHandlers.ServerInboundMessageHandler;
+import inboundHandlers.ServerInboundAuthHandler;
+import inboundHandlers.ServerInboundCommandHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -28,7 +29,10 @@ public class CloudServer {
                             channel.pipeline().addLast(
                                     new MessageDecoder(),
                                     new MessageEncoder(),
-                                    new ServerInboundMessageHandler());
+                                    new ServerInboundAuthHandler(),
+
+                                    //TODO: добавить динамическое добавление хендлеров после авторизации
+                                    new ServerInboundCommandHandler());
                         }
                     });
 

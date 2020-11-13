@@ -1,4 +1,6 @@
-import messages.Message;
+import messages.AbstractMessage;
+import messages.MessageUtils;
+import messages.command.CommandMessage;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -24,7 +26,7 @@ public class CloudClient {
                 try (DataInputStream in = new DataInputStream(socket.getInputStream())){
                     while (true) {
                         int cnt = in.read(buf);
-                        String msg = Message.of(Arrays.copyOf(buf, cnt)).toString();
+                        String msg = MessageUtils.getMessageFromBytes(Arrays.copyOf(buf, cnt)).toString();
                         System.out.println(msg);
                         if (msg.contains("/close")) {
                             System.out.println("Bye...");
@@ -48,7 +50,7 @@ public class CloudClient {
         }
     }
 
-    public void send(Message msg) {
+    public <M extends AbstractMessage> void send(M msg) {
         send(msg.toBytes());
     }
 

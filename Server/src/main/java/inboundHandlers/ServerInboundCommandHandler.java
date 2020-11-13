@@ -2,9 +2,9 @@ package inboundHandlers;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import messages.Message;
+import messages.command.CommandMessage;
 
-public class ServerInboundMessageHandler extends SimpleChannelInboundHandler<Message> {
+public class ServerInboundCommandHandler extends SimpleChannelInboundHandler<CommandMessage> {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         System.out.println("Client connected: " + ctx.channel().remoteAddress());
@@ -22,7 +22,7 @@ public class ServerInboundMessageHandler extends SimpleChannelInboundHandler<Mes
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, Message msg) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, CommandMessage msg) throws Exception {
         System.out.println(msg.toString());
         ctx.writeAndFlush(msg);
     }
