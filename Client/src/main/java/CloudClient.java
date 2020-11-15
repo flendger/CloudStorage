@@ -1,6 +1,5 @@
 import messages.AbstractMessage;
 import messages.MessageUtils;
-import messages.command.CommandMessage;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

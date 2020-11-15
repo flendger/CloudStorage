@@ -2,6 +2,7 @@ package messages;
 
 import messages.auth.AuthMessage;
 import messages.command.CommandMessage;
+import messages.command.CommandMessageType;
 import messages.dataTransfer.DataTransferMessage;
 
 public class MessageUtils {
@@ -16,5 +17,17 @@ public class MessageUtils {
                 return ((T) new DataTransferMessage(bytes));
         }
         return null;
+    }
+
+    public static CommandMessage getErrorMessage(String text) {
+        CommandMessage msg = new CommandMessage(CommandMessageType.MSG_ERR);
+        msg.setParameter(text);
+        return msg;
+    }
+
+    public static CommandMessage getOKMessage(String text) {
+        CommandMessage msg = new CommandMessage(CommandMessageType.MSG_OK);
+        msg.setParameter(text);
+        return msg;
     }
 }

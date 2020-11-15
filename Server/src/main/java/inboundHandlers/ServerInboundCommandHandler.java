@@ -3,6 +3,7 @@ package inboundHandlers;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import messages.command.CommandMessage;
+import messages.command.CommandMessageType;
 
 public class ServerInboundCommandHandler extends SimpleChannelInboundHandler<CommandMessage> {
     @Override
@@ -24,6 +25,18 @@ public class ServerInboundCommandHandler extends SimpleChannelInboundHandler<Com
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, CommandMessage msg) throws Exception {
         System.out.println(msg.toString());
-        ctx.writeAndFlush(msg);
+        switch (msg.getCommand()) {
+            case MSG_OK:
+                break;
+            case MSG_ERR:
+                break;
+            case MSG_GET_LS:
+                //TODO: return ls;
+                CommandMessage replyMsg = new CommandMessage(CommandMessageType.MSG_OK);
+//                replyMsg.setParameter();
+            default:
+                break;
+        }
+        ctx.writeAndFlush(new CommandMessage(CommandMessageType.MSG_OK));
     }
 }

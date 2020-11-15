@@ -1,7 +1,5 @@
 package messages;
 
-import java.time.LocalTime;
-
 /**
  * Message protocol:
  *      msg_length - [long] header (15 bytes) + data (non-fix)
@@ -34,6 +32,10 @@ public abstract class AbstractMessage implements Message{
 
     @Override
     public String toString() {
-        return String.format("[%s] [%s]", msgId, msgType.toString());
+        return "Message{" +
+                "msgId=" + msgId +
+                ", msgLength=" + getLength() +
+                ", msgType=" + msgType +
+                '}';
     }
 }

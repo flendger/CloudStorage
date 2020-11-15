@@ -1,4 +1,3 @@
-import messages.MessageType;
 import messages.auth.AuthMessage;
 import messages.command.CommandMessage;
 import messages.command.CommandMessageType;
@@ -17,6 +16,19 @@ public class ClientApp {
                 msg = scanner.nextLine();
                 String[] commands = msg.split(" ");
                 if (commands.length == 0) continue;
+
+                if (commands[0].equals("/auth")) {
+                    if (commands.length < 3) {
+                        System.out.println("Не достаточно параметров...");
+                        continue;
+                    }
+                    AuthMessage am = new AuthMessage();
+                    am.setUser(commands[1]);
+                    am.setPass(commands[2]);
+//                    am.setRegistration(true);
+                    client.send(am);
+                    continue;
+                }
 
                 CommandMessageType type = CommandMessageType.findByCommand(commands[0]);
                 if (type == null) {

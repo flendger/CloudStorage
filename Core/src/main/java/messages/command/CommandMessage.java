@@ -84,8 +84,9 @@ public class CommandMessage extends AbstractMessage {
     @Override
     public String toString() {
         return "CommandMessage{" +
-                "msgType=" + msgType +
-                ", msgId=" + msgId +
+                "msgId=" + msgId +
+                ", msgLength=" + getLength() +
+                ", msgType=" + msgType +
                 ", command=" + command +
                 ", parameter='" + parameter + '\'' +
                 '}';

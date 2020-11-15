@@ -12,10 +12,9 @@ public class AuthMessage extends AbstractMessage {
     public static final int HEADER_LENGTH = 11;
     private final ByteBuffer bf = ByteBuffer.allocate(2048);
 
-    private String user;
-    private String pass;
-    private boolean isRegister;
-    private String parameter;
+    private String user = "";
+    private String pass = "";
+    private boolean isRegistration;
 
     public AuthMessage(byte[] bytes) {
         super(MessageType.AUTH);
@@ -33,8 +32,8 @@ public class AuthMessage extends AbstractMessage {
         bf.putInt(getLength());
         bf.putShort(msgType.getId());
         bf.putInt(msgId);
-        bf.put((isRegister ? (byte)1 : 0));
-        bf.put(parameter.getBytes());
+        bf.put((isRegistration ? (byte)1 : 0));
+        bf.put(getParameter().getBytes());
 
         bf.flip();
         return Arrays.copyOf(bf.array(), bf.limit());
@@ -50,7 +49,7 @@ public class AuthMessage extends AbstractMessage {
         bf.getShort(); //message type
         msgId = bf.getInt();
 
-        isRegister = bf.get() == 1;
+        isRegistration = bf.get() == 1;
 
         byte[] parBytes = new byte[(int) (length - HEADER_LENGTH)];
         int pos = 0;
@@ -58,28 +57,35 @@ public class AuthMessage extends AbstractMessage {
             parBytes[pos] = bf.get();
             pos++;
         }
-        parameter = new String(parBytes, StandardCharsets.UTF_8);
+        setUserPassFormParameter(new String(parBytes, StandardCharsets.UTF_8));
     }
 
     @Override
     public int getLength() {
-        return HEADER_LENGTH + parameter.getBytes().length;
+        return HEADER_LENGTH + getParameter().getBytes().length;
     }
 
     public String getParameter() {
-        return parameter;
+        return (user.trim() + ";" + pass.trim());
     }
 
-    public void setParameter(String parameter) {
-        this.parameter = parameter;
+    private void setUserPassFormParameter(String parameter) {
+        String[] params = parameter.split(";");
+        if (params.length == 0) return;
+
+        this.user = params[0].trim();
+
+        if (params.length > 1) {
+            this.pass = params[1];
+        }
     }
 
-    public boolean isRegister() {
-        return isRegister;
+    public boolean isRegistration() {
+        return isRegistration;
     }
 
-    public void setRegister(boolean register) {
-        isRegister = register;
+    public void setRegistration(boolean registration) {
+        isRegistration = registration;
     }
 
     public String getUser() {
@@ -96,5 +102,17 @@ public class AuthMessage extends AbstractMessage {
 
     public void setPass(String pass) {
         this.pass = pass;
+    }
+
+    @Override
+    public String toString() {
+        return "AuthMessage{" +
+                "msgId=" + msgId +
+                ", msgLength=" + getLength() +
+                ", msgType=" + msgType +
+                ", user='" + user + '\'' +
+                ", pass='" + pass + '\'' +
+                ", isRegister=" + isRegistration +
+                '}';
     }
 }
