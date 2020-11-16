@@ -32,16 +32,16 @@ public final class FileUtils {
         }
     }
 
-    public static String changeDir(String newDir, String curPath) throws NoSuchFileException, NotDirectoryException {
+    public static String changeDir(String newDir, String curPath, String root) throws NoSuchFileException, NotDirectoryException {
         Path path = Path.of(curPath);
 
         if (newDir.equals("/")) {
-            while (path.getParent() != null) {
+            while (!path.equals(Path.of(root)) && path.getParent() != null) {
                 path = path.getParent();
             }
             return path.toString();
         } else if(newDir.equals("..")) {
-            if (path.getParent() == null) {
+            if (path.equals(Path.of(root)) || path.getParent() == null) {
                 return path.toString();
             }
             path = path.getParent();

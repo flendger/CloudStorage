@@ -36,13 +36,11 @@ public class ClientApp {
                     continue;
                 }
 
-                for (int i = 0; i < 2; i++) {
-                    CommandMessage cm = new CommandMessage(type);
-                    if (commands.length > 1) {
-                        cm.setParameter(commands[1]);
-                    }
-                    client.send(cm);
+                CommandMessage cm = new CommandMessage(type);
+                if (commands.length > 1) {
+                    cm.setParameter(commands[1]);
                 }
+                client.send(cm);
             } while (!msg.equals("/close"));
         } catch (IOException e) {
             e.printStackTrace();
