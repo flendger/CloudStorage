@@ -9,11 +9,13 @@ import java.util.Arrays;
 
 public class CommandMessage extends AbstractMessage {
 
-    public static final int HEADER_LENGTH = 12;
+    public static final int HEADER_LENGTH = 16;
     private final ByteBuffer bf = ByteBuffer.allocate(2048);
 
     private CommandMessageType command;
     private String parameter = "";
+    private byte[] data = new byte[0];
+
 
     public CommandMessage(byte[] bytes) {
         super(MessageType.COMMAND);
@@ -33,7 +35,9 @@ public class CommandMessage extends AbstractMessage {
         bf.putShort(msgType.getId());
         bf.putInt(msgId);
         bf.putShort(command.getId());
+        bf.putInt(parameter.getBytes().length);
         bf.put(parameter.getBytes());
+        bf.put(data);
 
         bf.flip();
         return Arrays.copyOf(bf.array(), bf.limit());
@@ -51,26 +55,27 @@ public class CommandMessage extends AbstractMessage {
 
         command = CommandMessageType.findById(bf.getShort());
 
-        byte[] parBytes = new byte[(int) (length - HEADER_LENGTH)];
+        int parLength = bf.getInt();
+
+        byte[] parBytes = new byte[parLength];
         int pos = 0;
-        while (bf.hasRemaining()) {
+        while (bf.hasRemaining() && pos < parLength) {
             parBytes[pos] = bf.get();
             pos++;
         }
         parameter = new String(parBytes, StandardCharsets.UTF_8);
+
+        data = new byte[length - HEADER_LENGTH - parLength];
+        if (bf.hasRemaining()) bf.get(data);
     }
 
     @Override
     public int getLength() {
-        return HEADER_LENGTH + parameter.getBytes().length;
+        return HEADER_LENGTH + parameter.getBytes().length + data.length;
     }
 
     public CommandMessageType getCommand() {
         return command;
-    }
-
-    public void setCommand(CommandMessageType command) {
-        this.command = command;
     }
 
     public String getParameter() {
@@ -81,6 +86,14 @@ public class CommandMessage extends AbstractMessage {
         this.parameter = parameter;
     }
 
+    public byte[] getData() {
+        return data;
+    }
+
+    public void setData(byte[] data) {
+        this.data = data;
+    }
+
     @Override
     public String toString() {
         return "CommandMessage{" +
@@ -89,6 +102,7 @@ public class CommandMessage extends AbstractMessage {
                 ", msgType=" + msgType +
                 ", command=" + command +
                 ", parameter='" + parameter + '\'' +
+                ", data length='" + data.length + '\'' +
                 '}';
     }
 }
