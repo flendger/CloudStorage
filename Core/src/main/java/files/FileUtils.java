@@ -1,12 +1,35 @@
-import java.io.File;
+package files;
+
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.stream.Stream;
 
 public final class FileUtils {
 
-    public static String getFilesList(String path) {
-        return String.join(" ", new File(path).list());
+    public static FileList getFilesList(String path) {
+        FileList fileList = new FileList();
+
+        try {
+            Path parentPath = Paths.get(path);
+            Files.walk(parentPath, 1)
+                    .filter(arg -> !arg.equals(parentPath))
+                    .forEach(arg -> fileList.add(FileInfo.of(arg.toString())));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return fileList;
+    }
+
+    public static void createDirIfNotExist(String dir) throws IOException {
+        Path path = Path.of(dir);
+        if (Files.exists(path) && !Files.isDirectory(path)) {
+            throw new NotDirectoryException("Path is not directory: " + dir);
+        }
+
+        if (! Files.exists(path)) {
+            Files.createDirectory(path);
+        }
     }
 
     public static String changeDir(String newDir, String curPath) throws NoSuchFileException, NotDirectoryException {

@@ -1,6 +1,6 @@
+import files.FileUtils;
 import inboundHandlers.MessageDecoder;
 import inboundHandlers.ServerInboundAuthHandler;
-import inboundHandlers.ServerInboundCommandHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -10,12 +10,14 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import outboundHandlers.MessageEncoder;
+import services.ServerConf;
 
 public class CloudServer {
 
-    private final static int SERVER_PORT = 8780;
 
     public CloudServer() throws Exception{
+        FileUtils.createDirIfNotExist(ServerConf.SERVER_ROOT_DIR);
+
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
@@ -29,14 +31,12 @@ public class CloudServer {
                             channel.pipeline().addLast(
                                     new MessageDecoder(),
                                     new MessageEncoder(),
-                                    new ServerInboundAuthHandler(),
-
-                                    //TODO: добавить динамическое добавление хендлеров после авторизации
-                                    new ServerInboundCommandHandler());
+                                    new ServerInboundAuthHandler()
+                                    );
                         }
                     });
 
-            b.bind(SERVER_PORT).sync().channel().closeFuture().sync();
+            b.bind(ServerConf.SERVER_PORT).sync().channel().closeFuture().sync();
         } finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();

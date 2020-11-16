@@ -1,5 +1,8 @@
+import files.FileList;
 import messages.AbstractMessage;
+import messages.Message;
 import messages.MessageUtils;
+import messages.command.CommandMessage;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -25,8 +28,21 @@ public class CloudClient {
                 try (DataInputStream in = new DataInputStream(socket.getInputStream())){
                     while (true) {
                         int cnt = in.read(buf);
-                        String msg = MessageUtils.getMessageFromBytes(Arrays.copyOf(buf, cnt)).toString();
+                        Message msgObject = MessageUtils.getMessageFromBytes(Arrays.copyOf(buf, cnt));
+                        String msg = msgObject.toString();
                         System.out.println(msg);
+
+                        if (msgObject instanceof CommandMessage) {
+                            CommandMessage comMsg = (CommandMessage) msgObject;
+                            switch (comMsg.getCommand()) {
+                                case MSG_PUT_LS:
+                                    if (comMsg.getData().length > 0) {
+                                        FileList fl = (FileList) MessageUtils.BytesToObject(comMsg.getData());
+                                        System.out.println(fl);
+                                    }
+                                    break;
+                            }
+                        }
                         if (msg.contains("/close")) {
                             System.out.println("Bye...");
                             break;

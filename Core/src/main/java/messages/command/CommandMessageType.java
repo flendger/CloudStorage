@@ -7,8 +7,9 @@ public enum CommandMessageType {
     MSG_OK((short) 0, "ok"),
     MSG_ERR((short) 1, "error"),
     MSG_GET_LS((short) 2, "ls"),
-    MSG_GET_FILE((short) 3, "get file"),
-    MSG_PUT_FILE((short) 4, "put file");
+    MSG_PUT_LS((short) 3, "put ls"),
+    MSG_GET_FILE((short) 4, "get file"),
+    MSG_PUT_FILE((short) 5, "put file");
 
 
     private final short id;
