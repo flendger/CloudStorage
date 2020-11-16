@@ -1,6 +1,7 @@
 package services;
 
 import java.io.Serializable;
+import java.nio.file.Path;
 
 public class UserProfile implements Serializable {
 
@@ -16,5 +17,9 @@ public class UserProfile implements Serializable {
         this.pass = pass;
         this.root = root;
         this.curDir = root;
+    }
+
+    public String getAbsoluteRoot(String rootDir) {
+        return Path.of(rootDir, root).toString();
     }
 }
