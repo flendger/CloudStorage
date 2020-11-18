@@ -71,6 +71,10 @@ public final class FileUtils {
         return path.toString();
     }
 
+    public static boolean fileExist(String fileName, String curPath) {
+        return Files.exists(Path.of(curPath, fileName));
+    }
+
     public static String touchFile(String fileName, String curPath) throws IOException{
         Path path = Path.of(curPath, fileName);
         if (Files.exists(path)){

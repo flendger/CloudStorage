@@ -10,7 +10,6 @@ import messages.command.CommandMessageType;
 import services.ServerConf;
 import services.UserProfile;
 
-import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.NotDirectoryException;

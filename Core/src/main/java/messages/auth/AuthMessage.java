@@ -25,6 +25,13 @@ public class AuthMessage extends AbstractMessage {
         super(MessageType.AUTH);
     }
 
+    public AuthMessage(String user, String pass, boolean isRegistration) {
+        this();
+        this.user = user;
+        this.pass = pass;
+        this.isRegistration = isRegistration;
+    }
+
     @Override
     public byte[] toBytes() {
         bf.clear();

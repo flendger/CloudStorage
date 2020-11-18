@@ -53,6 +53,7 @@ public class ServerInboundAuthHandler extends SimpleChannelInboundHandler<AuthMe
                 ctx.writeAndFlush(MessageUtils.getOKMessage(String.format("User [%s] authorized.", msg.getUser())));
                 ctx.channel().pipeline().remove(this);
                 ctx.channel().pipeline().addLast(new ServerInboundCommandHandler(userProfile));
+                ctx.channel().pipeline().addLast(new ServerInboundDataTransferHandler(userProfile));
             } catch (IOException e) {
                 ctx.writeAndFlush(MessageUtils.getErrorMessage("Authorization failed. Can't make user root dir: " + e.getMessage()));
             }

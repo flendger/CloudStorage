@@ -12,6 +12,8 @@ public class ClientApp {
             client.connect("localhost", 8780);
             String msg;
             Scanner scanner = new Scanner(System.in);
+            client.send(new AuthMessage("l1", "p1", false));
+
             do {
                 msg = scanner.nextLine();
                 String[] commands = msg.split(" ");
@@ -22,11 +24,16 @@ public class ClientApp {
                         System.out.println("Не достаточно параметров...");
                         continue;
                     }
-                    AuthMessage am = new AuthMessage();
-                    am.setUser(commands[1]);
-                    am.setPass(commands[2]);
-//                    am.setRegistration(true);
-                    client.send(am);
+                    client.send(new AuthMessage(commands[1], commands[2], false));
+                    continue;
+                }
+
+                if (commands[0].equals("/send")) {
+                    if (commands.length < 2) {
+                        System.out.println("Не достаточно параметров...");
+                        continue;
+                    }
+                    client.sendFile(commands[1]);
                     continue;
                 }
 
