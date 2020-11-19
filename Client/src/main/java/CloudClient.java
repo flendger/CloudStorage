@@ -1,4 +1,5 @@
 import files.FileList;
+import files.FileUtils;
 import messages.AbstractMessage;
 import messages.Message;
 import messages.MessageUtils;
@@ -18,9 +19,6 @@ public class CloudClient {
 
     private final Socket socket = new Socket();
     private DataOutputStream out;
-
-    private byte[] readBuf;
-    private byte[] writeBuf;
 
 
     public void connect(String host, int port) throws IOException {
@@ -42,7 +40,7 @@ public class CloudClient {
                 int length = in.readInt();
                 if (length == 0) continue;
 
-                readBuf = Arrays.copyOf(ByteBuffer.allocate(4).putInt(length).array(), length);
+                byte[] readBuf = Arrays.copyOf(ByteBuffer.allocate(4).putInt(length).array(), length);
                 in.read(readBuf, 4, length - 4);
                 Message msgObject = MessageUtils.getMessageFromBytes(readBuf);
                 String msg = msgObject.toString();
@@ -90,7 +88,7 @@ public class CloudClient {
     }
 
     //TODO: move sending to FileUtils
-    //TODO: add collecting file form messages
+    //TODO: add collecting file from messages
     public void sendFile(String filePath) throws IOException{
         Path path = Path.of(filePath);
         if (! Files.exists(path)) throw new NoSuchFileException("File doesn't exist: " + path.toString());
@@ -98,9 +96,9 @@ public class CloudClient {
 
         File file = new File(filePath);
         FileInputStream fileBytes = new FileInputStream(file);
-        writeBuf = new byte[DataTransferMessage.MAX_DATA_BUFFER_SIZE];
+        byte[] writeBuf = new byte[DataTransferMessage.MAX_DATA_BUFFER_SIZE];
 
-        int fileId = DataTransferMessage.generateFileId();
+        int fileId = FileUtils.generateFileId();
 
         int cnt = fileBytes.read(writeBuf);
         boolean isFirst = true;

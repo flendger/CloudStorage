@@ -128,4 +128,93 @@ public final class FileUtils {
 
         return Files.newBufferedReader(path).lines();
     }
+
+    public static int generateFileId() {
+        return (int) (Math.random() * 100000);
+    }
+
+    public static String createTmpFile(int fileId, String curPath) throws IOException {
+        String tmpName = "tmp" + fileId + generateFileId();
+        Path path = Path.of(curPath, tmpName);
+        Files.createFile(path);
+
+        return path.toAbsolutePath().toString();
+    }
+
+    public static void writeDataToFile(String file, byte[] data) throws IOException {
+        Files.write(Path.of(file),
+                data,
+                StandardOpenOption.APPEND);
+    }
+
+    public static void renameTmpToFile(String tmp, String dir, String fileName) throws IOException {
+        StringBuilder sb = new StringBuilder(fileName);
+        int cnt = 0;
+        Path path;
+        do {
+            path = Path.of(dir, sb.toString());
+            cnt ++;
+            sb.setLength(0);
+            sb.append(removeExtension(fileName))
+                    .append("_")
+                    .append(cnt)
+                    .append(".")
+                    .append(getExtension(fileName));
+        } while (Files.exists(path));
+        sb.setLength(0);
+
+        Files.move(Path.of(tmp), path);
+    }
+
+    /**
+     * Remove the file extension from a filename, that may include a path.
+     *
+     * e.g. /path/to/myfile.jpg -> /path/to/myfile
+     */
+    public static String removeExtension(String filename) {
+        if (filename == null) {
+            return null;
+        }
+
+        int index = indexOfExtension(filename);
+
+        if (index == -1) {
+            return filename;
+        } else {
+            return filename.substring(0, index);
+        }
+    }
+
+    /**
+     * Return the file extension from a filename, including the "."
+     *
+     * e.g. /path/to/myfile.jpg -> .jpg
+     */
+    public static String getExtension(String filename) {
+        if (filename == null) {
+            return null;
+        }
+
+        int index = indexOfExtension(filename);
+
+        if (index == -1) {
+            return filename;
+        } else {
+            return filename.substring(index);
+        }
+    }
+
+    private static final char EXTENSION_SEPARATOR = '.';
+
+    public static int indexOfExtension(String filename) {
+
+        if (filename == null) {
+            return -1;
+        }
+
+        // Check that no directory separator appears after the
+        // EXTENSION_SEPARATOR
+
+        return filename.lastIndexOf(EXTENSION_SEPARATOR);
+    }
 }

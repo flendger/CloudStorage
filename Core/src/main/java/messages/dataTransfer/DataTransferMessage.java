@@ -34,9 +34,6 @@ public class DataTransferMessage extends AbstractMessage {
     private boolean isFirst;
     private boolean isEOF;
 
-    public static int generateFileId() {
-        return (int) (Math.random() * 100000);
-    }
 
     public DataTransferMessage() {
         super(MessageType.DATA_TRANSFER);
