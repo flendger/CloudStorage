@@ -1,11 +1,15 @@
 package messages;
 
+import files.FileUtils;
 import messages.auth.AuthMessage;
 import messages.command.CommandMessage;
 import messages.command.CommandMessageType;
 import messages.dataTransfer.DataTransferMessage;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
 
 public class MessageUtils {
     public static <T extends AbstractMessage> T getMessageFromBytes(byte[] bytes) {
@@ -55,4 +59,35 @@ public class MessageUtils {
         }
         return res;
     }
+
+    public static void sendFile(String filePath, Sendable ref) throws IOException{
+        Path path = Path.of(filePath);
+        if (! Files.exists(path)) throw new NoSuchFileException("File doesn't exist: " + path.toString());
+        if (Files.isDirectory(path)) throw new NoSuchFileException("File is directory: " + path.toString());
+
+        File file = new File(filePath);
+        FileInputStream fileBytes = new FileInputStream(file);
+        byte[] writeBuf = new byte[DataTransferMessage.MAX_DATA_BUFFER_SIZE];
+
+        int fileId = FileUtils.generateFileId();
+
+        int cnt = fileBytes.read(writeBuf);
+        boolean isFirst = true;
+        while (cnt != -1) {
+            DataTransferMessage msg = new DataTransferMessage();
+            msg.setFileId(fileId);
+            msg.setFileName(path.getFileName().toString());
+            msg.setData(writeBuf, cnt);
+            msg.setFirst(isFirst);
+
+            cnt = fileBytes.read(writeBuf);
+            if (cnt == -1) {
+                msg.setEOF(true);
+            }
+            isFirst = false;
+
+            ref.send(msg);
+        }
+    }
+
 }

@@ -8,19 +8,17 @@ import messages.MessageUtils;
 import messages.dataTransfer.DataTransferMessage;
 import services.UserProfile;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class ServerInboundDataTransferHandler extends SimpleChannelInboundHandler<DataTransferMessage> {
     private final UserProfile userProfile;
-    private final HashMap<Integer, FileTransferRecord> incomingFiles;
+    private final ConcurrentHashMap<Integer, FileTransferRecord> incomingFiles;
 
     public ServerInboundDataTransferHandler(UserProfile userProfile) {
         this.userProfile = userProfile;
-        this.incomingFiles = new HashMap<>();
+        this.incomingFiles = new ConcurrentHashMap<>();
     }
 
     @Override

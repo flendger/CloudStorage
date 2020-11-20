@@ -1,6 +1,6 @@
 import files.FileList;
+import files.FileTransferRecord;
 import files.FileUtils;
-import messages.AbstractMessage;
 import messages.Message;
 import messages.MessageUtils;
 import messages.command.CommandMessage;
@@ -10,29 +10,20 @@ import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class CloudClient {
 
     private final Socket socket = new Socket();
+    private final ConcurrentHashMap<Integer, FileTransferRecord> incomingFiles;
     private DataOutputStream out;
 
-
-    public void connect(String host, int port) throws IOException {
-        socket.connect(new InetSocketAddress(host, port));
-        try {
-            out = new DataOutputStream(socket.getOutputStream());
-
-            Thread readThread = new Thread(this::read);
-            readThread.setDaemon(true);
-            readThread.start();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public CloudClient() {
+        this.incomingFiles = new ConcurrentHashMap<>();
     }
+
 
     private void read() {
         try (DataInputStream in = new DataInputStream(socket.getInputStream())){
@@ -57,7 +48,7 @@ public class CloudClient {
                             break;
                     }
                 } else if (msgObject instanceof DataTransferMessage) {
-                    System.out.println("Received file...");
+                    getFilePart((DataTransferMessage) msgObject);
                 }
                 if (msg.contains("/close")) {
                     System.out.println("Bye...");
@@ -75,7 +66,51 @@ public class CloudClient {
         }
     }
 
-    public <M extends AbstractMessage> void send(M msg) {
+    private void getFilePart(DataTransferMessage msg) throws IOException {
+        //isFirst -> create tmp file -> add record to active file list
+        //record:
+        // fileId - msg.fileId = Key
+        // fullTmpName - "tmp" + fileId + generateId
+        // destDir - curDir
+        // fileName - msg.fileName
+        if (msg.isFirst()) {
+            //TODO: add user profile, current dir etc...
+            String curDir = Path.of("ClientStorage").toAbsolutePath().toString();
+            String tmp = FileUtils.createTmpFile(msg.getFileId(), curDir);
+
+            incomingFiles.put(msg.getFileId(),
+                    new FileTransferRecord(msg.getFileId(), msg.getFileName(), tmp, curDir));
+        }
+
+        //is file in list -> write part or ignore
+        FileTransferRecord rec = incomingFiles.get(msg.getFileId());
+        if (rec == null) {
+            return;
+        }
+        FileUtils.writeDataToFile(rec.tmpFileName, msg.getData());
+
+        //EOF -> rename file + remove from list or ignore
+        if (! msg.isEOF()) {
+            return;
+        }
+        incomingFiles.remove(rec.fileId);
+        FileUtils.renameTmpToFile(rec.tmpFileName, rec.dir, rec.fileName);
+    }
+
+    public void connect(String host, int port) throws IOException {
+        socket.connect(new InetSocketAddress(host, port));
+        try {
+            out = new DataOutputStream(socket.getOutputStream());
+
+            Thread readThread = new Thread(this::read);
+            readThread.setDaemon(true);
+            readThread.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public <M extends Message> void send(M msg) {
         send(msg.toBytes());
     }
 
@@ -87,36 +122,8 @@ public class CloudClient {
         }
     }
 
-    //TODO: move sending to FileUtils
-    //TODO: add collecting file from messages
     public void sendFile(String filePath) throws IOException{
-        Path path = Path.of(filePath);
-        if (! Files.exists(path)) throw new NoSuchFileException("File doesn't exist: " + path.toString());
-        if (Files.isDirectory(path)) throw new NoSuchFileException("File is directory: " + path.toString());
-
-        File file = new File(filePath);
-        FileInputStream fileBytes = new FileInputStream(file);
-        byte[] writeBuf = new byte[DataTransferMessage.MAX_DATA_BUFFER_SIZE];
-
-        int fileId = FileUtils.generateFileId();
-
-        int cnt = fileBytes.read(writeBuf);
-        boolean isFirst = true;
-        while (cnt != -1) {
-            DataTransferMessage msg = new DataTransferMessage();
-            msg.setFileId(fileId);
-            msg.setFileName(path.getFileName().toString());
-            msg.setData(writeBuf, cnt);
-            msg.setFirst(isFirst);
-
-            cnt = fileBytes.read(writeBuf);
-            if (cnt == -1) {
-                msg.setEOF(true);
-            }
-            isFirst = false;
-
-            send(msg);
-        }
+        MessageUtils.sendFile(filePath, this::send);
     }
 
     public void close() throws IOException {

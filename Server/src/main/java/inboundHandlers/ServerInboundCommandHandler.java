@@ -4,6 +4,7 @@ import files.FileList;
 import files.FileUtils;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import messages.Message;
 import messages.MessageUtils;
 import messages.command.CommandMessage;
 import messages.command.CommandMessageType;
@@ -13,9 +14,14 @@ import services.UserProfile;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.NotDirectoryException;
+import java.nio.file.Path;
 
 public class ServerInboundCommandHandler extends SimpleChannelInboundHandler<CommandMessage> {
+
     private final UserProfile userProfile;
+
+    private ChannelHandlerContext ctx;
+
 
     public ServerInboundCommandHandler(UserProfile userProfile) {
         this.userProfile = userProfile;
@@ -40,12 +46,14 @@ public class ServerInboundCommandHandler extends SimpleChannelInboundHandler<Com
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, CommandMessage msg) throws Exception {
         System.out.println(msg.toString());
+        this.ctx = ctx;
+
         switch (msg.getCommand()) {
             case MSG_GET_LS:
                 CommandMessage replyMsg = new CommandMessage(CommandMessageType.MSG_PUT_LS);
                 FileList fl = FileUtils.getFilesList(userProfile.curDir);
                 replyMsg.setData(MessageUtils.ObjectToBytes(fl));
-                ctx.writeAndFlush(replyMsg);
+                send(replyMsg);
                 break;
             case MSG_GET_CD:
                 try {
@@ -53,11 +61,11 @@ public class ServerInboundCommandHandler extends SimpleChannelInboundHandler<Com
                     userProfile.curDir = newDir;
                     CommandMessage putCd = new CommandMessage(CommandMessageType.MSG_PUT_CD);
                     putCd.setParameter(newDir);
-                    ctx.writeAndFlush(putCd);
+                    send(putCd);
                 } catch (NotDirectoryException e) {
-                    ctx.writeAndFlush(MessageUtils.getErrorMessage("Destination is not directory: " + e.getMessage()));
+                    send(MessageUtils.getErrorMessage("Destination is not directory: " + e.getMessage()));
                 } catch (NoSuchFileException e) {
-                    ctx.writeAndFlush(MessageUtils.getErrorMessage("Directory doesn't exist: " + e.getMessage()));
+                    send(MessageUtils.getErrorMessage("Directory doesn't exist: " + e.getMessage()));
                 }
                 break;
             case MSG_GET_MD:
@@ -66,13 +74,27 @@ public class ServerInboundCommandHandler extends SimpleChannelInboundHandler<Com
                     userProfile.curDir = newDir;
                     CommandMessage putMd = new CommandMessage(CommandMessageType.MSG_PUT_MD);
                     putMd.setParameter(newDir);
-                    ctx.writeAndFlush(putMd);
+                    send(putMd);
                 } catch (FileAlreadyExistsException e) {
-                    ctx.writeAndFlush(MessageUtils.getErrorMessage("Destination already exists: " + e.getMessage()));
+                    send(MessageUtils.getErrorMessage("Destination already exists: " + e.getMessage()));
+                }
+                break;
+            case MSG_GET_FILE:
+                try {
+                    MessageUtils.sendFile(
+                            Path.of(userProfile.curDir, msg.getParameter()).toAbsolutePath().toString(),
+                            this::send);
+                    send(MessageUtils.getOKMessage(String.format("File [%s] download completed", msg.getParameter())));
+                } catch (NoSuchFileException e) {
+                    send(MessageUtils.getErrorMessage(String.format("File doesn't exist: %s", msg.getParameter())));
                 }
                 break;
             default:
-                ctx.writeAndFlush(msg);
+                send(msg);
         }
+    }
+
+    private void send(Message msg) {
+        ctx.writeAndFlush(msg);
     }
 }
