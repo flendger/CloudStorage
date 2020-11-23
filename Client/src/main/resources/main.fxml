@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="center" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/10.0.2-internal"
+      fx:controller="fxgui.Controller">
+    <MenuBar>
+        <Menu text="Файл">
+            <MenuItem text="Подключиться" onAction="#btnConnect"/>
+            <MenuItem text="Выйти из программы" onAction="#btnExitAction"/>
+        </Menu>
+    </MenuBar>
+
+    <HBox VBox.vgrow="ALWAYS">
+        <fx:include fx:id="leftPanel" source="panel.fxml" HBox.hgrow="ALWAYS" />
+        <fx:include fx:id="rightPanel" source="remotePanel.fxml" HBox.hgrow="ALWAYS" />
+    </HBox>
+
+    <HBox spacing="5">
+        <Button maxWidth="Infinity" focusTraversable="false" text="Upload" HBox.hgrow="ALWAYS" onAction="#uploadBtnAction"/>
+        <Button maxWidth="Infinity" focusTraversable="false" text="Download" HBox.hgrow="ALWAYS" onAction="#downloadBtnAction"/>
+        <Button maxWidth="Infinity" focusTraversable="false" text="Refresh" HBox.hgrow="ALWAYS" onAction="#refreshBtnAction"/>
+        <Button maxWidth="Infinity" focusTraversable="false" text="Exit" HBox.hgrow="ALWAYS" onAction="#btnExitAction"/>
+        <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+        </padding>
+    </HBox>
+</VBox>

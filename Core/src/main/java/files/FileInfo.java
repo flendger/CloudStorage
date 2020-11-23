@@ -4,67 +4,71 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 public class FileInfo implements Serializable {
-    private String name;
-    private Long length;
-    private boolean isDirectory;
-    private String path;
+    private final String name;
+    private final Long size;
+    private final boolean isDirectory;
+    private final String path;
+    private final LocalDateTime lastModified;
 
     public static FileInfo of(String pathString) {
-        Path path = Path.of(pathString);
+        Path path = Paths.get(pathString);
         if (! Files.exists(path)) return null;
 
-        FileInfo fileInfo = new FileInfo();
-        fileInfo.name = path.getFileName().toString();
-        fileInfo.isDirectory = Files.isDirectory(path);
+        return new FileInfo(path);
+    }
+
+    public static FileInfo of(Path path) {
+        if (! Files.exists(path)) return null;
+
+        return new FileInfo(path);
+    }
+
+    private FileInfo(Path path) {
+        this.name = path.getFileName().toString();
+        this.isDirectory = Files.isDirectory(path);
+        long fSize = -1L;
+        LocalDateTime fModified = LocalDateTime.MIN;
         try {
-            fileInfo.length = Files.size(path);
+            if (!isDirectory) fSize = Files.size(path);
+            fModified = LocalDateTime.ofInstant(Files.getLastModifiedTime(path).toInstant(), ZoneOffset.ofHours(3));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        fileInfo.path = path.toString();
-
-        return fileInfo;
+        this.size = fSize;
+        this.lastModified = fModified;
+        this.path = path.toString();
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Long getLength() {
-        return length;
-    }
-
-    public void setLength(Long length) {
-        this.length = length;
+    public Long getSize() {
+        return size;
     }
 
     public boolean isDirectory() {
         return isDirectory;
     }
 
-    public void setDirectory(boolean directory) {
-        isDirectory = directory;
-    }
-
     public String getPath() {
         return path;
     }
 
-    public void setPath(String path) {
-        this.path = path;
+    public LocalDateTime getLastModified() {
+        return lastModified;
     }
 
     @Override
     public String toString() {
         return "FileInfo{" +
                 "name='" + name + '\'' +
-                ", length=" + length +
+                ", size=" + size +
                 ", isDirectory=" + isDirectory +
                 ", path='" + path + '\'' +
                 '}';

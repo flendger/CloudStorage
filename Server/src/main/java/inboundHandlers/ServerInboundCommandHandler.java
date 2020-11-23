@@ -51,7 +51,9 @@ public class ServerInboundCommandHandler extends SimpleChannelInboundHandler<Com
         switch (msg.getCommand()) {
             case MSG_GET_LS:
                 CommandMessage replyMsg = new CommandMessage(CommandMessageType.MSG_PUT_LS);
-                FileList fl = FileUtils.getFilesList(userProfile.curDir);
+                String curDir = userProfile.curDir;
+                FileList fl = FileUtils.getFilesList(curDir);
+                replyMsg.setParameter(curDir);
                 replyMsg.setData(MessageUtils.ObjectToBytes(fl));
                 send(replyMsg);
                 break;

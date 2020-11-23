@@ -27,4 +27,13 @@ public class MessageHeader {
         msgType = MessageType.getInstance(bf.getShort());
         msgId = bf.getInt();
     }
+
+    @Override
+    public String toString() {
+        return "MessageHeader{" +
+                "msgId=" + msgId +
+                ", msgLength=" + msgLength +
+                ", msgType=" + msgType +
+                '}';
+    }
 }

@@ -25,7 +25,7 @@ import java.util.Arrays;
 public class DataTransferMessage extends AbstractMessage {
 
     public static final int HEADER_LENGTH = 20;
-    public static final int MAX_DATA_BUFFER_SIZE = 256;
+    public static final int MAX_DATA_BUFFER_SIZE = 8192;
     private final ByteBuffer bf = ByteBuffer.allocate(HEADER_LENGTH + MAX_DATA_BUFFER_SIZE + 1024); //1024 - for fileName
 
     private int fileId;

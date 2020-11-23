@@ -14,7 +14,11 @@ public enum CommandMessageType {
     MSG_PUT_MD((short) 7, "put_mkdir"),
     MSG_FILE_DOWNLOAD_ERR((short) 8, "download_err"),
     MSG_FILE_UPLOAD_ERR((short) 9, "upload_err"),
-    MSG_GET_FILE((short) 10, "download");
+    MSG_GET_FILE((short) 10, "download"),
+    MSG_AUTH_OK((short) 11, "auth ok"),
+    MSG_AUTH_ERROR((short) 12, "auth error"),
+    MSG_REG_OK((short) 13, "reg ok"),
+    MSG_REG_ERROR((short) 14, "reg error");
 
 
     private final short id;

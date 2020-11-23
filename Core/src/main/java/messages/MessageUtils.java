@@ -10,6 +10,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class MessageUtils {
     public static <T extends AbstractMessage> T getMessageFromBytes(byte[] bytes) {
@@ -37,6 +38,16 @@ public class MessageUtils {
         return msg;
     }
 
+    public static CommandMessage getLsMessage() {
+        return new CommandMessage(CommandMessageType.MSG_GET_LS);
+    }
+
+    public static CommandMessage getCdMessage(String dir) {
+        CommandMessage msg = new CommandMessage(CommandMessageType.MSG_GET_CD);
+        msg.setParameter(dir);
+        return msg;
+    }
+
     public static byte[] ObjectToBytes(Object o) {
         byte[] bytes = null;
         try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -61,7 +72,7 @@ public class MessageUtils {
     }
 
     public static void sendFile(String filePath, Sendable ref) throws IOException{
-        Path path = Path.of(filePath);
+        Path path = Paths.get(filePath);
         if (! Files.exists(path)) throw new NoSuchFileException("File doesn't exist: " + path.toString());
         if (Files.isDirectory(path)) throw new NoSuchFileException("File is directory: " + path.toString());
 
@@ -73,6 +84,7 @@ public class MessageUtils {
 
         int cnt = fileBytes.read(writeBuf);
         boolean isFirst = true;
+
         while (cnt != -1) {
             DataTransferMessage msg = new DataTransferMessage();
             msg.setFileId(fileId);

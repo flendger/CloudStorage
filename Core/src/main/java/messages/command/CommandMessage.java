@@ -27,6 +27,11 @@ public class CommandMessage extends AbstractMessage {
         this.command = command;
     }
 
+    public CommandMessage(CommandMessageType command, String parameter) {
+        this(command);
+        this.parameter = parameter;
+    }
+
     @Override
     public byte[] toBytes() {
         bf.clear();

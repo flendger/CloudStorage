@@ -6,6 +6,10 @@ import java.util.stream.Stream;
 
 public final class FileUtils {
 
+    public static String getFullPath(String dir) {
+        return Paths.get(dir).toAbsolutePath().toString();
+    }
+
     public static FileList getFilesList(String path) {
         FileList fileList = new FileList();
 
@@ -22,7 +26,7 @@ public final class FileUtils {
     }
 
     public static void createDirIfNotExist(String dir) throws IOException {
-        Path path = Path.of(dir);
+        Path path = Paths.get(dir);
         if (Files.exists(path) && !Files.isDirectory(path)) {
             throw new NotDirectoryException("Path is not directory: " + dir);
         }
@@ -33,22 +37,22 @@ public final class FileUtils {
     }
 
     public static String changeDir(String newDir, String curPath, String root) throws NoSuchFileException, NotDirectoryException {
-        Path path = Path.of(curPath);
+        Path path = Paths.get(curPath);
 
         if (newDir.equals("/")) {
-            while (!path.equals(Path.of(root)) && path.getParent() != null) {
+            while (!path.equals(Paths.get(root)) && path.getParent() != null) {
                 path = path.getParent();
             }
             return path.toString();
         } else if(newDir.equals("..")) {
-            if (path.equals(Path.of(root)) || path.getParent() == null) {
+            if (path.equals(Paths.get(root)) || path.getParent() == null) {
                 return path.toString();
             }
             path = path.getParent();
         } else if (newDir.equals(".")) {
             return path.toString();
         } else {
-            path = Path.of(curPath, newDir);
+            path = Paths.get(curPath, newDir);
         }
         if (Files.exists(path)) {
             if (Files.isDirectory(path)) {
@@ -62,7 +66,7 @@ public final class FileUtils {
     }
 
     public static String makeDir(String dirName, String curPath) throws IOException {
-        Path path = Path.of(curPath, dirName);
+        Path path = Paths.get(curPath, dirName);
         if (Files.exists(path)){
             throw new FileAlreadyExistsException(dirName);
         }
@@ -72,11 +76,11 @@ public final class FileUtils {
     }
 
     public static boolean fileExist(String fileName, String curPath) {
-        return Files.exists(Path.of(curPath, fileName));
+        return Files.exists(Paths.get(curPath, fileName));
     }
 
     public static String touchFile(String fileName, String curPath) throws IOException{
-        Path path = Path.of(curPath, fileName);
+        Path path = Paths.get(curPath, fileName);
         if (Files.exists(path)){
             throw new FileAlreadyExistsException(fileName);
         }
@@ -86,7 +90,7 @@ public final class FileUtils {
     }
 
     public static String removeFile(String fileName, String curPath) throws IOException{
-        Path path = Path.of(curPath, fileName);
+        Path path = Paths.get(curPath, fileName);
         if (!Files.exists(path)){
             throw new NoSuchFileException(fileName);
         }
@@ -96,12 +100,12 @@ public final class FileUtils {
     }
 
     public static String copyFile(String src, String dst) throws IOException {
-        Path srcPath = Path.of(src);
+        Path srcPath = Paths.get(src);
         if (!Files.exists(srcPath) || Files.isDirectory(srcPath)) {
             throw new NoSuchFileException(src);
         }
 
-        Path destPath = Path.of(dst);
+        Path destPath = Paths.get(dst);
         Path destDirPath = Files.isDirectory(destPath) ? destPath : destPath.getParent();
 
         if (!Files.exists(destDirPath)) {
@@ -121,7 +125,7 @@ public final class FileUtils {
     }
 
     public static Stream<String> catFile(String fileName) throws IOException{
-        Path path = Path.of(fileName);
+        Path path = Paths.get(fileName);
         if (!Files.exists(path) || Files.isDirectory(path)){
             throw new NoSuchFileException(fileName);
         }
@@ -135,14 +139,14 @@ public final class FileUtils {
 
     public static String createTmpFile(int fileId, String curPath) throws IOException {
         String tmpName = "tmp" + fileId + generateFileId();
-        Path path = Path.of(curPath, tmpName);
+        Path path = Paths.get(curPath, tmpName);
         Files.createFile(path);
 
         return path.toAbsolutePath().toString();
     }
 
     public static void writeDataToFile(String file, byte[] data) throws IOException {
-        Files.write(Path.of(file),
+        Files.write(Paths.get(file),
                 data,
                 StandardOpenOption.APPEND);
     }
@@ -152,18 +156,18 @@ public final class FileUtils {
         int cnt = 0;
         Path path;
         do {
-            path = Path.of(dir, sb.toString());
+            path = Paths.get(dir, sb.toString());
             cnt ++;
             sb.setLength(0);
             sb.append(removeExtension(fileName))
-                    .append("_")
+                    .append("(")
                     .append(cnt)
-                    .append(".")
+                    .append(")")
                     .append(getExtension(fileName));
         } while (Files.exists(path));
         sb.setLength(0);
 
-        Files.move(Path.of(tmp), path);
+        Files.move(Paths.get(tmp), path);
     }
 
     /**

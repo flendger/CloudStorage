@@ -5,6 +5,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import messages.MessageUtils;
 import messages.auth.AuthMessage;
+import messages.command.CommandMessage;
+import messages.command.CommandMessageType;
 import services.CreateProfileFailedException;
 import services.AuthService;
 import services.ServerConf;
@@ -36,26 +38,30 @@ public class ServerInboundAuthHandler extends SimpleChannelInboundHandler<AuthMe
         if (msg.isRegistration()) {
             try {
                 AuthService.createProfile(msg.getUser(), msg.getPass());
-                ctx.writeAndFlush(MessageUtils.getOKMessage(String.format("User [%s] registration succeed.", msg.getUser())));
+                ctx.writeAndFlush(new CommandMessage(CommandMessageType.MSG_REG_OK,
+                        String.format("User [%s] registration succeed.", msg.getUser())));
             } catch (CreateProfileFailedException e) {
-                ctx.writeAndFlush(MessageUtils.getErrorMessage(e.getMessage()));
+                ctx.writeAndFlush(new CommandMessage(CommandMessageType.MSG_REG_ERROR, e.getMessage()));
             }
         } else {
             UserProfile userProfile = AuthService.findProfile(msg.getUser(), msg.getPass());
             if (userProfile == null) {
-                ctx.writeAndFlush(MessageUtils.getErrorMessage(String.format("User [%s] authorization failed.", msg.getUser())));
+                ctx.writeAndFlush(new CommandMessage(CommandMessageType.MSG_AUTH_ERROR,
+                        String.format("User [%s] authorization failed.", msg.getUser())));
                 return;
             }
 
             try {
                 userProfile.curDir = Path.of(ServerConf.SERVER_ROOT_DIR, userProfile.root).toString();
                 FileUtils.createDirIfNotExist(userProfile.curDir);
-                ctx.writeAndFlush(MessageUtils.getOKMessage(String.format("User [%s] authorized.", msg.getUser())));
+                ctx.writeAndFlush(new CommandMessage(CommandMessageType.MSG_AUTH_OK,
+                        String.format("User [%s] authorized.", msg.getUser())));
                 ctx.channel().pipeline().remove(this);
                 ctx.channel().pipeline().addLast(new ServerInboundCommandHandler(userProfile));
                 ctx.channel().pipeline().addLast(new ServerInboundDataTransferHandler(userProfile));
             } catch (IOException e) {
-                ctx.writeAndFlush(MessageUtils.getErrorMessage("Authorization failed. Can't make user root dir: " + e.getMessage()));
+                ctx.writeAndFlush(new CommandMessage(CommandMessageType.MSG_AUTH_ERROR,
+                        "Authorization failed. Can't make user root dir: " + e.getMessage()));
             }
         }
     }
