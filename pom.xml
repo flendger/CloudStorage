@@ -16,8 +16,10 @@
     </properties>
 
     <modules>
-        <module>Server</module>
-        <module>Client</module>
-        <module>Core</module>
+        <module>server</module>
+        <module>client</module>
+        <module>core</module>
+        <module>clientfx</module>
+        <module>cli</module>
     </modules>
 </project>

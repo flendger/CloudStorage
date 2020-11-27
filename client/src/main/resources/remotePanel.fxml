@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox fx:id="rootPanel" alignment="center" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fxgui.RemotePanelController">
+    <HBox>
+        <TextField fx:id="pathField" editable="false" HBox.hgrow="ALWAYS" />
+        <Button onAction="#btnPathUpAction" text="Вверх" />
+    </HBox>
+    <TableView fx:id="filesTable" VBox.vgrow="ALWAYS" />
+</VBox>

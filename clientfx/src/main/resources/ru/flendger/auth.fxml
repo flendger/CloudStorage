@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox fx:id="auth" alignment="center" spacing="5 " xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.flendger.fxgui.AuthController">
+    <Label text="Авторизация">
+      <font>
+         <Font size="24.0" />
+      </font></Label>
+    <HBox spacing="5" VBox.vgrow="ALWAYS">
+         <Label prefHeight="24.0" prefWidth="164.0" text="Пользователь: " HBox.hgrow="NEVER" VBox.vgrow="ALWAYS">
+         <font>
+            <Font size="19.0" />
+         </font></Label>
+         <TextField fx:id="userField" prefHeight="26.0" prefWidth="241.0" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" />
+        <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+        </padding>
+    </HBox>
+    <HBox spacing="5" VBox.vgrow="ALWAYS">
+         <Label prefHeight="24.0" prefWidth="164.0" text="Пароль: " HBox.hgrow="NEVER" VBox.vgrow="ALWAYS">
+         <font>
+            <Font size="19.0" />
+         </font></Label>
+         <PasswordField fx:id="passField" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" />
+        <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+        </padding>
+    </HBox>
+    <HBox spacing="5" VBox.vgrow="ALWAYS">
+        <Button maxWidth="Infinity" focusTraversable="false" text="Авторизация" HBox.hgrow="ALWAYS" onAction="#connectBtnAction"/>
+        <Button maxWidth="Infinity" focusTraversable="false" text="Регистрация" HBox.hgrow="ALWAYS" onAction="#registerBtnAction"/>
+        <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+        </padding>
+    </HBox>
+</VBox>
