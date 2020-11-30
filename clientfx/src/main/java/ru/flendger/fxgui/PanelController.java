@@ -109,7 +109,7 @@ public class PanelController implements Initializable {
         }
     }
 
-    public void btnPathUpAction(ActionEvent actionEvent) {
+    public void btnPathUpAction() {
         Path upperPath = Paths.get(pathField.getText()).getParent();
         if (upperPath != null) {
             updateList(upperPath);

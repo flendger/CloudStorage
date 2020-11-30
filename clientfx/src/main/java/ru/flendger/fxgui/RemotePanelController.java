@@ -1,10 +1,10 @@
 package ru.flendger.fxgui;
 
+import clientcore.CloudClientNetty;
 import files.FileInfo;
 import files.FileList;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TableCell;
@@ -14,7 +14,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import messages.Message;
 import messages.MessageUtils;
-import clientcore.CloudClientNetty;
 
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
@@ -44,7 +43,7 @@ public class RemotePanelController implements Initializable {
 
         TableColumn<FileInfo, Long> fileSizeColumn = new TableColumn<>("Размер");
         fileSizeColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getSize()));
-        fileSizeColumn.setCellFactory(column -> new TableCell<FileInfo, Long>() {
+        fileSizeColumn.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(Long item, boolean empty) {
                 super.updateItem(item, empty);
@@ -91,7 +90,7 @@ public class RemotePanelController implements Initializable {
             filesTable.sort();
     }
 
-    public void btnPathUpAction(ActionEvent actionEvent) {
+    public void btnPathUpAction() {
         if (!rootPanel.getProperties().containsKey("client")) {
             return;
         }

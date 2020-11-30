@@ -1,12 +1,12 @@
 package ru.flendger.fxgui;
 
+import clientcore.CloudClientNetty;
 import files.FileList;
 import files.FileTransferRecord;
 import files.FileUtils;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -20,7 +20,6 @@ import messages.auth.AuthMessage;
 import messages.command.CommandMessage;
 import messages.command.CommandMessageType;
 import messages.dataTransfer.DataTransferMessage;
-import clientcore.CloudClientNetty;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -50,7 +49,7 @@ public class Controller {
             new Service<Void>() {
                 @Override
                 protected Task<Void> createTask() {
-                    return new Task<Void>() {
+                    return new Task<>() {
                         @Override
                         protected Void call() throws Exception {
                             client.connect("localhost", 8780);
@@ -134,11 +133,11 @@ public class Controller {
         FileUtils.renameTmpToFile(rec.tmpFileName, rec.dir, rec.fileName);
     }
 
-    public void btnExitAction(ActionEvent actionEvent) {
+    public void btnExitAction() {
         Platform.exit();
     }
 
-    public void uploadBtnAction(ActionEvent actionEvent) {
+    public void uploadBtnAction() {
         if (client.getChannel() == null) {
             FxUtils.showErr("Connection to server failed");
             return;
@@ -159,7 +158,7 @@ public class Controller {
         }
     }
 
-    public void refreshBtnAction(ActionEvent actionEvent) {
+    public void refreshBtnAction() {
         if (client.getChannel() == null) {
             FxUtils.showErr("Connection to server failed");
             return;
@@ -168,7 +167,7 @@ public class Controller {
         client.send(new CommandMessage(CommandMessageType.MSG_GET_LS));
     }
 
-    public void downloadBtnAction(ActionEvent actionEvent) {
+    public void downloadBtnAction() {
         if (client.getChannel() == null) {
             FxUtils.showErr("Connection to server failed");
             return;
@@ -186,7 +185,7 @@ public class Controller {
         ));
     }
 
-    public void btnConnect(ActionEvent actionEvent) {
+    public void btnConnect() {
         AuthMessage msg = null;
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/auth.fxml"));
