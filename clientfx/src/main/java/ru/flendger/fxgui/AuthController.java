@@ -1,4 +1,4 @@
-package fxgui;
+package ru.flendger.fxgui;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
