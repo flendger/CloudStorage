@@ -188,7 +188,7 @@ public class Controller {
     public void btnConnect() {
         AuthMessage msg = null;
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/auth.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/ru/flendger/auth.fxml"));
             Parent root = fxmlLoader.load();
             AuthController ctrl = fxmlLoader.getController();
             Stage stage = new Stage();
